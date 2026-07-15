@@ -1,296 +1,174 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tailmark — しっぽの成長に、しるしを。</title>
-  <meta name="description" content="犬との毎日を、いちばん美しく記録するiOSアプリ。体重も、ごはんも、おもいでも、10秒で。データは集めません。">
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png">
-  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
-  <meta property="og:title" content="Tailmark — しっぽの成長に、しるしを。">
-  <meta property="og:description" content="犬との毎日を、いちばん美しく記録するiOSアプリ。データは集めません。">
-  <meta property="og:image" content="https://tailmark.app/assets/og-image.png">
-  <meta property="og:url" content="https://tailmark.app">
-  <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary_large_image">
-  <style>
-    :root {
-      --orange: #FF7A00;
-      --orange-soft: #FFE5CC;
-      --ink: #111111;
-      --ink-2: #55555c;
-      --bg: #ffffff;
-      --bg-2: #f6f6f4;
-      --hairline: rgba(17, 17, 17, 0.08);
-      --card: #ffffff;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --orange-soft: #3a2410;
-        --ink: #f4f4f2;
-        --ink-2: #a4a4ac;
-        --bg: #111111;
-        --bg-2: #1a1a1c;
-        --hairline: rgba(255, 255, 255, 0.1);
-        --card: #1d1d20;
-      }
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
-      background: var(--bg);
-      color: var(--ink);
-      line-height: 1.9;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
-    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
-
-    /* ---- nav ---- */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
-      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-      background: color-mix(in srgb, var(--bg) 72%, transparent);
-      border-bottom: 1px solid var(--hairline);
-    }
-    .nav-inner {
-      max-width: 1080px; margin: 0 auto; padding: 14px 24px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-    .brand img { width: 30px; height: 30px; }
-    .brand span { font-size: 1.1rem; font-weight: 800; letter-spacing: 0.01em; color: var(--orange); }
-    .nav-links { display: flex; gap: 28px; }
-    .nav-links a {
-      color: var(--ink-2); text-decoration: none; font-size: 0.88rem; font-weight: 600;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--orange); }
-    @media (max-width: 560px) { .nav-links a:not(:last-child) { display: none; } }
-
-    /* ---- hero ---- */
-    .hero { padding: 150px 0 40px; }
-    .hero-grid {
-      display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 48px; align-items: center;
-    }
-    @media (max-width: 820px) { .hero-grid { grid-template-columns: 1fr; } }
-    .hero .mark { width: 84px; height: 84px; margin-bottom: 28px; animation: floaty 5s ease-in-out infinite; }
-    @keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-    @media (prefers-reduced-motion: reduce) { .hero .mark { animation: none; } }
-    h1 {
-      font-size: clamp(2.3rem, 5.4vw, 3.6rem);
-      font-weight: 850; line-height: 1.35; letter-spacing: 0.01em;
-    }
-    h1 .em { color: var(--orange); }
-    .lead { margin-top: 22px; font-size: 1.05rem; color: var(--ink-2); max-width: 34em; }
-    .status {
-      display: inline-flex; align-items: center; gap: 10px; margin-top: 34px;
-      background: var(--orange-soft); color: var(--orange);
-      border-radius: 999px; padding: 10px 22px; font-weight: 700; font-size: 0.9rem;
-    }
-    .status::before {
-      content: ""; width: 8px; height: 8px; border-radius: 50%;
-      background: var(--orange); animation: pulse 2s ease-in-out infinite;
-    }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-    .phone {
-      justify-self: center;
-      width: min(300px, 74vw);
-      border-radius: 44px;
-      border: 1px solid var(--hairline);
-      box-shadow: 0 32px 80px -24px rgba(17, 17, 17, 0.28);
-      overflow: hidden;
-      transform: rotate(2.2deg);
-    }
-    .phone img { width: 100%; display: block; }
-
-    /* ---- 犬の一言 ---- */
-    .voice { padding: 110px 0 90px; text-align: center; }
-    .voice .bubble {
-      display: inline-block; position: relative;
-      font-size: clamp(1.5rem, 3.6vw, 2.4rem); font-weight: 800; line-height: 1.6;
-    }
-    .voice .bubble small {
-      display: block; margin-top: 18px; font-size: 0.92rem; font-weight: 600; color: var(--ink-2);
-    }
-
-    /* ---- features ---- */
-    .features { padding: 40px 0 60px; }
-    .features-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
-    }
-    @media (max-width: 900px) { .features-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 560px) { .features-grid { grid-template-columns: 1fr; } }
-    .feature {
-      background: var(--card); border: 1px solid var(--hairline); border-radius: 20px;
-      padding: 30px 28px;
-    }
-    .feature .no {
-      font-size: 0.78rem; font-weight: 800; letter-spacing: 0.14em; color: var(--orange);
-    }
-    .feature h3 { font-size: 1.12rem; font-weight: 800; margin: 10px 0 8px; }
-    .feature p { font-size: 0.9rem; color: var(--ink-2); }
-
-    .section-title {
-      font-size: 0.82rem; font-weight: 800; letter-spacing: 0.22em;
-      color: var(--orange); margin-bottom: 40px;
-    }
-
-    /* ---- family ---- */
-    .family { padding: 60px 0 40px; }
-    .family-inner {
-      background: var(--orange); border-radius: 28px; padding: 64px 48px;
-      color: #fff; position: relative; overflow: hidden;
-    }
-    .family-inner::after {
-      content: ""; position: absolute; right: -60px; bottom: -90px;
-      width: 320px; height: 320px;
-      background: url(/assets/brandmark.png) no-repeat center / contain;
-      filter: brightness(0) invert(1); opacity: 0.16;
-    }
-    .family h2 { font-size: clamp(1.6rem, 3.6vw, 2.3rem); font-weight: 850; line-height: 1.5; }
-    .family p { margin-top: 14px; max-width: 34em; opacity: 0.92; font-size: 0.98rem; }
-    @media (max-width: 560px) { .family-inner { padding: 44px 28px; } }
-
-    /* ---- privacy ---- */
-    .privacy { background: var(--bg-2); padding: 110px 0; margin-top: 70px; }
-    .privacy h2 {
-      font-size: clamp(2rem, 4.6vw, 3rem); font-weight: 850; line-height: 1.4;
-    }
-    .privacy p { margin-top: 20px; color: var(--ink-2); max-width: 38em; }
-    .privacy a { color: var(--orange); font-weight: 700; text-decoration: none; }
-    .privacy a:hover { text-decoration: underline; }
-
-    /* ---- footer ---- */
-    footer { padding: 90px 0 60px; }
-    .foot-brand { display: flex; align-items: center; gap: 12px; }
-    .foot-brand img { width: 36px; height: 36px; }
-    .foot-brand span { font-weight: 800; font-size: 1.2rem; color: var(--orange); }
-    .foot-tag { margin-top: 10px; color: var(--ink-2); font-size: 0.9rem; }
-    .foot-links { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 24px; }
-    .foot-links a { color: var(--ink-2); font-size: 0.86rem; text-decoration: none; }
-    .foot-links a:hover { color: var(--orange); }
-    .copyright { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--hairline);
-      color: var(--ink-2); font-size: 0.8rem; }
-
-    /* ---- scroll reveal ---- */
-    .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.7s ease, transform 0.7s ease; }
-    .reveal.in { opacity: 1; transform: none; }
-    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
-  </style>
-</head>
-<body>
-  <nav>
-    <div class="nav-inner">
-      <a class="brand" href="/">
-        <img src="/assets/brandmark.png" alt="">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Tailmarkは、愛犬との毎日を写真・記録・思い出として残すiOSアプリです。" />
+    <meta name="theme-color" content="#101116" />
+    <title>Tailmark — 愛犬との毎日を、物語に。</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png" />
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+    <meta property="og:title" content="Tailmark — 愛犬との毎日を、物語に。" />
+    <meta property="og:description" content="愛犬との毎日を写真・記録・思い出として残すiOSアプリ。データは集めません。" />
+    <meta property="og:image" content="https://tailmark.app/assets/og-image.png" />
+    <meta property="og:url" content="https://tailmark.app" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="scroll-progress" aria-hidden="true"><span></span></div>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Tailmark トップへ">
+        <img src="assets/app-icon.png" alt="" width="44" height="44" />
         <span>Tailmark</span>
       </a>
-      <div class="nav-links">
-        <a href="#features">機能</a>
+      <nav aria-label="メインナビゲーション">
+        <a href="#story">できること</a>
         <a href="#privacy">プライバシー</a>
-        <a href="mailto:support@tailmark.app">お問い合わせ</a>
-      </div>
-    </div>
-  </nav>
+      </nav>
+      <a class="nav-cta" href="https://www.instagram.com/tailmark_jp/" target="_blank" rel="noreferrer">最新情報</a>
+    </header>
 
-  <header class="hero wrap">
-    <div class="hero-grid">
-      <div>
-        <img class="mark" src="/assets/brandmark.png" alt="Tailmark">
-        <h1>しっぽの成長に、<br><span class="em">しるしを。</span></h1>
-        <p class="lead">Tailmarkは、犬との毎日をいちばん美しく記録するiOSアプリ。体重も、ごはんも、さんぽも、おもいでも — 10秒で、しるしがつきます。</p>
-        <div class="status">App Storeにて公開準備中・2026年秋</div>
-      </div>
-      <div class="phone reveal">
-        <img src="/assets/app-home.jpg" alt="Tailmarkのホーム画面">
-      </div>
-    </div>
-  </header>
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="section-shell hero-inner">
+        <div class="hero-copy reveal">
+          <p class="hero-wordmark" aria-label="Tailmark">Tailmark</p>
+          <p class="eyebrow"><span></span> 愛犬との毎日を、物語にするアプリ</p>
+          <h1 id="hero-title">写真だけじゃ、<br /><em>もったいない。</em></h1>
+          <p class="hero-lead">体重も、ごはんも、はじめてのおでかけも。<br />愛犬と過ごした今日を、いつか開きたくなる物語に。</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#story">Tailmarkを知る <span>↓</span></a>
+            <a class="button button-text" href="https://www.instagram.com/tailmark_jp/" target="_blank" rel="noreferrer">Instagramで見る <span>↗</span></a>
+          </div>
+          <p class="availability"><i></i> App Store 公開準備中</p>
+        </div>
+        <div class="hero-visual reveal" data-parallax="0.05" aria-label="Tailmarkのホーム画面">
+          <div class="sun"></div>
+          <div class="hero-sticker sticker-one">きょうも<br /><b>いい日。</b></div>
+          <div class="hero-sticker sticker-two">MEMORIES<br />FOR LIFE</div>
+          <div class="device hero-device"><img src="assets/shots/home.jpg" alt="愛犬の写真と今日の記録を表示したTailmarkホーム画面" /></div>
+        </div>
+        </div>
+      </section>
 
-  <section class="voice wrap reveal">
-    <div class="bubble">
-      「おはよう ! 今日で70日目だよ。」
-      <small>ホームでは、その子があなたに話しかけてきます。</small>
-    </div>
-  </section>
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-track">
+          <div class="marquee-group">
+            <span>きょうも、いい日。</span><i>✦</i>
+            <span>MEMORIES FOR LIFE</span><i>✦</i>
+            <span>さんぽ日和</span><i>✦</i>
+            <span>はじめて、がいっぱい</span><i>✦</i>
+            <span>ごはん、完食。</span><i>✦</i>
+            <span>しっぽの成長に、しるしを。</span><i>✦</i>
+          </div>
+          <div class="marquee-group">
+            <span>きょうも、いい日。</span><i>✦</i>
+            <span>MEMORIES FOR LIFE</span><i>✦</i>
+            <span>さんぽ日和</span><i>✦</i>
+            <span>はじめて、がいっぱい</span><i>✦</i>
+            <span>ごはん、完食。</span><i>✦</i>
+            <span>しっぽの成長に、しるしを。</span><i>✦</i>
+          </div>
+        </div>
+      </div>
 
-  <section id="features" class="features wrap">
-    <p class="section-title reveal">FEATURES</p>
-    <div class="features-grid">
-      <div class="feature reveal">
-        <span class="no">01 — LOG</span>
-        <h3>10秒のきろく</h3>
-        <p>体重・ごはん・さんぽ・ケア。ホームからワンタップ、考える前に記録が終わります。</p>
-      </div>
-      <div class="feature reveal">
-        <span class="no">02 — ALBUM</span>
-        <h3>育っていくアルバム</h3>
-        <p>月ごとに束ねられた写真たち。撮影場所は地図の上にも、思い出のピンとして残ります。</p>
-      </div>
-      <div class="feature reveal">
-        <span class="no">03 — GROWTH</span>
-        <h3>せいちょうグラフ</h3>
-        <p>体重の伸びに、その日の写真が重なる。数字だけじゃない成長曲線です。</p>
-      </div>
-      <div class="feature reveal">
-        <span class="no">04 — MONTHLY</span>
-        <h3>ひと月のものがたり</h3>
-        <p>月末には、その月の記録がストーリーに。1年分は、とっておきの振り返りに。</p>
-      </div>
-      <div class="feature reveal">
-        <span class="no">05 — WALK</span>
-        <h3>さんぽの軌跡</h3>
-        <p>GPSが散歩の経路を描きます。お気に入りの道が、地図の上に増えていく。</p>
-      </div>
-      <div class="feature reveal">
-        <span class="no">06 — CARD</span>
-        <h3>見せたくなるカード</h3>
-        <p>自己紹介も、成長のグラフも。そのままInstagramに置ける美しさで書き出せます。</p>
-      </div>
-    </div>
-  </section>
+      <section class="overview section-shell reveal" aria-labelledby="overview-title">
+        <div class="overview-heading">
+          <p class="overline">TAILMARKでできること</p>
+          <h2 id="overview-title">毎日を残して、<br />何度でも振り返る。</h2>
+          <p>写真、健康、おでかけ、毎月の思い出。<br />愛犬との時間に必要なものを、ひとつにまとめました。</p>
+        </div>
+        <div class="overview-cards">
+          <article><span class="overview-icon">✦</span><h3>今日を記録</h3><p>体重・ごはん・写真を、ワンタップで。</p></article>
+          <article><span class="overview-icon">⌁</span><h3>アルバムと地図</h3><p>写真も場所も、ふたりだけの記憶に。</p></article>
+          <article><span class="overview-icon">♡</span><h3>ケアを見守る</h3><p>予定と記録を、ひとつのカレンダーに。</p></article>
+          <article><span class="overview-icon">◐</span><h3>月を振り返る</h3><p>日々の記録が、毎月の物語になる。</p></article>
+        </div>
+      </section>
 
-  <section class="family wrap reveal">
-    <div class="family-inner">
-      <h2>家族みんなで、同じ一冊を。</h2>
-      <p>別々のApple IDでも、招待ひとつで同じ子の記録を一緒に書けます。パパのさんぽも、ママのごはんも、リアルタイムにひとつのきろくへ。</p>
-    </div>
-  </section>
+      <section id="story" class="story section-shell">
+        <div class="story-heading reveal">
+          <p class="overline">今日を、迷わず残す。</p>
+          <h2>なんでもない今日が、<br /><em>ちゃんと残る。</em></h2>
+          <p>ホームから、体重・ごはん・思い出・ケア・さんぽをワンタップ。続けるために、考えさせない設計です。</p>
+        </div>
+        <div class="feature-row feature-home reveal">
+          <div class="feature-image"><div class="device"><img src="assets/shots/home.jpg" alt="クイック記録が並ぶTailmarkのホーム画面" /></div></div>
+          <div class="feature-copy">
+            <h3>今日のことを、<br />10秒で。</h3>
+            <p>その日の気分で、いちばん近いアイコンをひとつ。毎日の積み重ねが、いつの間にか大切な記録になります。</p>
+            <ul><li>体重・ごはん・さんぽ</li><li>写真と思い出メモ</li><li>ワンタップのクイック記録</li></ul>
+          </div>
+        </div>
+      </section>
 
-  <section id="privacy" class="privacy">
-    <div class="wrap reveal">
-      <p class="section-title">PRIVACY</p>
-      <h2>データを、集めません。</h2>
-      <p>記録も写真も、あなたの端末とあなたのiCloudの中だけ。広告なし、トラッキングなし、アカウント登録なし。私たちはあなたの愛犬のデータを見ることすらできません。</p>
-      <p><a href="/privacy/">プライバシーポリシー →</a></p>
-    </div>
-  </section>
+      <section class="album-section">
+        <span class="giant-word" aria-hidden="true">MEMORIES</span>
+        <div class="section-shell album-grid">
+          <div class="album-copy reveal">
+            <p class="overline">写真も、行った場所も。</p>
+            <h2>アルバムをめくると、<br /><em>あの日に帰れる。</em></h2>
+            <p>写真は月ごとにまとまり、撮った場所は地図のピンに。いつもの公園も、はじめての旅先も、ふたりだけの地図になっていきます。</p>
+          </div>
+          <div class="album-visuals reveal">
+            <figure class="tilt-card card-album" data-parallax="0.03"><div class="device"><img src="assets/shots/album.jpg" alt="月ごとに写真を振り返るアルバム画面" /></div></figure>
+            <figure class="tilt-card card-map" data-parallax="-0.02"><div class="device"><img src="assets/shots/map.jpg" alt="写真を地図上のピンで振り返るマップ画面" /></div></figure>
+            <div class="map-note">OUR<br /><b>PLACES</b><span>●</span></div>
+          </div>
+        </div>
+      </section>
 
-  <footer class="wrap">
-    <div class="foot-brand">
-      <img src="/assets/brandmark.png" alt="">
-      <span>Tailmark</span>
-    </div>
-    <p class="foot-tag">しっぽの成長に、しるしを。</p>
-    <div class="foot-links">
-      <a href="/privacy/">プライバシーポリシー</a>
-      <a href="/terms/">利用規約</a>
-      <a href="mailto:support@tailmark.app">support@tailmark.app</a>
-      <a href="https://www.instagram.com/tailmark_jp/" target="_blank" rel="noopener">Instagram</a>
-    </div>
-    <p class="copyright">© 2026 Tailmark</p>
-  </footer>
+      <section class="care section-shell">
+        <div class="care-image reveal"><div class="device"><img src="assets/shots/care.jpg" alt="トリミングやワクチンなどの予定を管理するケア画面" /></div></div>
+        <div class="care-copy reveal">
+          <p class="overline">忘れたくないことも、そっとそばに。</p>
+          <h2>イベントも健康も、<br /><em>ひとつのカレンダーに。</em></h2>
+          <p>ワクチン、お薬、通院、トリミング。予定も記録も見渡せるから、「あれ、いつだっけ？」を減らせます。</p>
+          <div class="care-tags"><span>ワクチン</span><span>お薬</span><span>通院</span><span>トリミング</span></div>
+        </div>
+      </section>
 
-  <script>
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
-      }
-    }, { threshold: 0.15 });
-    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
-  </script>
-</body>
+      <section class="monthly-section">
+        <div class="monthly-glow"></div>
+        <div class="section-shell monthly-grid">
+          <div class="monthly-copy reveal">
+            <p class="overline">TAILMARK MONTHLY</p>
+            <h2>月末には、<br /><em>ふたりの一冊ができる。</em></h2>
+            <p>写真も、記録も、その月の“はじめて”も。Tailmark Monthlyが、いつもの1か月を何度でも見返したいストーリーにまとめます。</p>
+          </div>
+          <div class="monthly-image reveal" data-parallax="0.025"><div class="device"><img src="assets/shots/monthly.jpg" alt="月の思い出を物語として振り返るTailmark Monthly画面" /></div></div>
+        </div>
+      </section>
+
+      <section id="privacy" class="privacy section-shell reveal">
+        <div class="privacy-icon">✦</div>
+        <p class="overline">PRIVACY BY DESIGN</p>
+        <h2>大切な思い出を、<br />私たちは集めません。</h2>
+        <p>写真も記録も、あなたの端末とあなたのiCloudの中だけ。広告なし、トラッキングなし、アカウント登録なし。愛犬の時間は、あなたと家族のものです。</p>
+        <a href="/privacy/">プライバシーポリシーを読む <span>→</span></a>
+      </section>
+
+      <section class="closing section-shell reveal">
+        <img src="assets/app-icon.png" alt="Tailmark" width="84" height="84" />
+        <p class="overline">TAILMARK FOR IOS</p>
+        <h2>愛犬との毎日に、<br /><em>しるしを。</em></h2>
+        <p>App Storeでの公開に向けて準備中です。</p>
+        <a class="button button-primary" href="https://www.instagram.com/tailmark_jp/" target="_blank" rel="noreferrer">公開情報を受け取る <span>↗</span></a>
+      </section>
+    </main>
+
+    <footer class="site-footer section-shell">
+      <a class="brand" href="#top"><img src="assets/app-icon.png" alt="" width="36" height="36" /><span>Tailmark</span></a>
+      <p>しっぽの成長に、しるしを。</p>
+      <div><a href="/privacy/">プライバシー</a><a href="/terms/">利用規約</a><a href="mailto:support@tailmark.app">お問い合わせ</a></div>
+      <small>© 2026 Tailmark</small>
+    </footer>
+    <script src="script.js"></script>
+  </body>
 </html>
